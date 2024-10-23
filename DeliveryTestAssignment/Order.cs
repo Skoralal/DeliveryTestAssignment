@@ -1,4 +1,6 @@
-﻿namespace DeliveryTestAssignment
+﻿using System.Text;
+
+namespace DeliveryTestAssignment
 {
     public class Order
     {
@@ -10,6 +12,10 @@
             {
                 return CompletionTime.ToString("yyyy-MM-dd HH:mm:ss");
             } }
+        public Order()
+        {
+            
+        }
         public Order(double weight, int districtID, DateTime completionTime) 
         {
             Id = Guid.NewGuid();
@@ -20,15 +26,22 @@
         public Order GenerateRandom()
         {
             var rand = new Random();
-            //var weight = Math.Round(0.1 + (rand.NextDouble() * (500 - 0.1)), 2);
             var weight = rand.Next(1, 50001)/100;
-            var districtID = rand.Next(1, 201);
-            var startDate = new DateTime(2020, 1, 1);
+            var districtID = rand.Next(1, 5);
+            var startDate = new DateTime(2024, 10, 22);
             var endDate = DateTime.Now;
             var timeSpan = endDate - startDate;
             double randomTicks = rand.NextDouble() * timeSpan.Ticks;
             var completionTime = startDate.AddTicks((long)randomTicks);
-            return new Order(weight, districtID, completionTime);
+            Id = Guid.NewGuid();
+            Weight = weight;
+            DistrictID = districtID;
+            CompletionTime = completionTime;
+            return this;
+        }
+        public override string ToString()
+        {
+            return $"Id = {Id}\nВес = {Weight}\nРайон доставки = {DistrictID}\nДата доставки = {HumanDate}\n";
         }
     }
 }

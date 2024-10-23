@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Text;
 using System.Text.Json;
 using System.Xml.Linq;
 
@@ -7,11 +8,13 @@ namespace DeliveryTestAssignment
 {
     public static class DataBaseService
     {
-        static AppSettings _appSettings = new(false);
+        static AppSettings _appSettings = new();
         private static string DBPath = _appSettings.DBPath;
         private static string LogPath = _appSettings.LogPath;
+        private static string OutPath = _appSettings.OutputPath;
         private static StreamWriter? DBWriter;
-        private static StreamWriter LogWriter = new(LogPath);
+        private static StreamWriter LogWriter = new(LogPath, true);
+        private static StreamWriter OutWriter = new(OutPath, false);
         public static ObservableCollection<Order> Orders { get; set; }
         
         static DataBaseService()
@@ -68,25 +71,41 @@ namespace DeliveryTestAssignment
             using (var DBreader = new StreamReader(DBPath))
             {
                 json = DBreader.ReadToEnd();
-            }
+
                 if (json.Length == 0)
                 {
+                    DBreader.Dispose();
                     DBWriter = new(DBPath, false);
                     Orders = new ObservableCollection<Order>();
                     return true;
                 }
+            }
             DBWriter = new(DBPath, false);
+            DBWriter.Write(json);
+            DBWriter.Flush();
             Orders = JsonSerializer.Deserialize<ObservableCollection<Order>>(json);
+            
             return true;
         }
         private static bool UpdateData()
         {
             string json = JsonSerializer.Serialize(Orders);
             DBWriter.BaseStream.SetLength(0);
-            DBWriter!.Write(json);
+            DBWriter.Write(json);
             DBWriter.Flush();
             return true;
         }
-
+        public static bool WriteOutput(List<Order> toWrite)
+        {
+            OutWriter.BaseStream.SetLength(0);
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (Order order in toWrite) 
+            { 
+                stringBuilder.Append(order.ToString());
+            }
+            OutWriter.Write(stringBuilder);
+            OutWriter.Flush();
+            return true;
+        }
     }
 }
