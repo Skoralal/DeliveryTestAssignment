@@ -76,7 +76,6 @@ namespace DeliveryTestAssignment
         }
         public void ChangeDBPath(string newPath)
         {
-
             DBPath = newPath;
             using (StreamWriter writer = new StreamWriter(SettingsFilePath))
             {

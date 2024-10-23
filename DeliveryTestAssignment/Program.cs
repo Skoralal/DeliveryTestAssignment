@@ -7,7 +7,33 @@ namespace DeliveryTestAssignment
         static void Main(string[] args)
         {
             //Console.WriteLine(DataBaseService.Orders.Count);
-            AppSettings appSettings = new AppSettings();
+            AppSettings appSettings;
+            try
+            {
+                appSettings = new AppSettings();
+
+            } catch (System.UnauthorizedAccessException ex)
+            {
+                Console.WriteLine("Нет доступа к директории, хотите сбрость настройки y/n?");
+                var input = Console.ReadLine();
+                while (input != "y" && input != "n")
+                {
+                    Console.WriteLine("Invalid command");
+                    input = Console.ReadLine();
+                }
+                if(input == "n")
+                {
+                    Environment.Exit(0);
+                }
+                if (input == "y")
+                {
+                    appSettings = new AppSettings(true);
+                }
+            }
+            finally {
+            
+                appSettings = new AppSettings();
+            }
             while (true)
             {
                 Console.WriteLine("Новая сессия\n" +
@@ -32,7 +58,7 @@ namespace DeliveryTestAssignment
                     double weight;
                     int districtID;
                     DateTime completionTime;
-                    Console.WriteLine("Введите вес заказа в килограммах");
+                    Console.WriteLine("Введите вес заказа в килограммах, если значение дробное, используйте запятую");
                     bool weightParseSuccess = double.TryParse(Console.ReadLine(), out weight);
                     while (!weightParseSuccess)
                     {
@@ -165,7 +191,7 @@ namespace DeliveryTestAssignment
                     }
                     TimeSpan timeSpan = TimeSpan.FromMinutes(minutes);
                     List<Order> toWrite = DataBaseService.Orders.Where(order => order.DistrictID == districtID &&
-                        order.CompletionTime <= firstDelivery + timeSpan).OrderBy(order=>order.CompletionTime).ToList();
+                        order.CompletionTime <= firstDelivery + timeSpan && order.CompletionTime >= firstDelivery).OrderBy(order=>order.CompletionTime).ToList();
                     DataBaseService.WriteOutput(toWrite);
                     Console.WriteLine($"{toWrite.Count} записей выгружено в результат");
                 }

@@ -4,7 +4,7 @@ namespace DeliveryTestAssignment
 {
     public class Order
     {
-        public Guid Id { get;}
+        public Guid Id { get; set; }
         public double Weight { get; set; }
         public int DistrictID { get; set; }
         public DateTime CompletionTime { get; set; }
@@ -26,7 +26,7 @@ namespace DeliveryTestAssignment
         public Order GenerateRandom()
         {
             var rand = new Random();
-            var weight = rand.Next(1, 50001)/100;
+            var weight = rand.NextDouble()*500;
             var districtID = rand.Next(1, 5);
             var startDate = new DateTime(2024, 10, 22);
             var endDate = DateTime.Now;
